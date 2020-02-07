@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class TracingTest {
+public class WebClientsTest {
 
     @Autowired
     private WebClient.Builder webClientBuilder;
@@ -62,7 +62,7 @@ public class TracingTest {
                     .bodyToMono(String.class)
                     .doOnNext(response -> spanIdInReactorThread.set(Tracing.currentTracer().currentSpan().context().spanIdString()))
                     .flatMap(response -> Mono.subscriberContext()
-                            .doOnNext(context -> spanIdInReactorContext.set(context.get(Span.class).context().spanIdString()))
+                            .doOnNext(context -> spanIdInReactorContext.set(context.get(TraceContext.class).spanIdString()))
                             .then(Mono.just(response)))
                     .block();
             TraceContext contextAfterCall = Tracing.currentTracer().currentSpan().context();
